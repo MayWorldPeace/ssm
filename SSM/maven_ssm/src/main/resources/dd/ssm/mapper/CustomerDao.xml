@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dd.ssm.mapper.CustomerDao">
+	<sql id="customer_list_where">
+		<where>
+			<if test="custName !=null and custName != ''">
+				and cust_name LIKE '%${custName}%'
+			</if>
+			<if test="custSource !=null and custSource != ''">
+				AND cust_source = #{custSource}
+			</if>
+			<if test="custIndustory !=null and custIndustory != ''">
+				AND cust_industry = #{custIndustory}
+			</if>
+			<if test="custLevel !=null and custLevel != ''">
+				AND cust_level = #{custLevel}
+			</if>
+		</where>
+	</sql>
+	<select id="getCustomerList" parameterType="queryvo" resultType="customer">
+		SELECT
+		a.cust_id,
+		a.cust_name,
+		a.cust_user_id,
+		a.cust_create_id,
+		b.dict_item_name cust_source,
+		c.dict_item_name cust_industry,
+		d.dict_item_name cust_level,
+		a.cust_linkman,
+		a.cust_phone,
+		a.cust_mobile,
+		a.cust_zipcode,
+		a.cust_address,
+		a.cust_createtime
+		FROM
+		customer a
+		LEFT JOIN base_dict b ON a.cust_source = b.dict_id
+		LEFT JOIN base_dict c ON a.cust_industry = c.dict_id
+		LEFT JOIN base_dict d ON a.cust_level = d.dict_id
+		<include refid="customer_list_where"/>
+		<if test="start != null">
+			limit #{start},#{size}
+		</if>
+	</select>
+	<select id="getCustomerListCount" parameterType="queryvo" resultType="int">
+		SELECT count(0)
+		FROM
+		customer a
+		LEFT JOIN base_dict b ON a.cust_source = b.dict_id
+		LEFT JOIN base_dict c ON a.cust_industry = c.dict_id
+		LEFT JOIN base_dict d ON a.cust_level = d.dict_id
+		<include refid="customer_list_where"/>
+	</select>
+</mapper>
